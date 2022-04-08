@@ -13,25 +13,23 @@ async function main() {
   // manually to make sure everything is compiled
   // await hre.run('compile');
 
-
-  // We get the contract to deploy
-  const PopContract = await hre.ethers.getContractFactory("PopPussiesPopPopMoreTests");
+  //const PopContract = await hre.ethers.getContractFactory("PopPussiesPopPopMoreTests");
   //const connected = await PopContract.deploy("poppussiespoppopmoretests", "PPPPmoretest", "", {gasLimit: 8000000, gasPrice: ethers.utils.parseUnits('500', 'gwei')});
   //await connected.deployed();
   //console.log("Deployed to: ", connected.address);
   //console.log(ethers.utils.parseUnits('0.00001', 'ether'));
 
-  const connected = await PopContract.attach("0xC14724Ed33fD1f77D76dc0Ac1b7772C3F0C75d91");
+  //const connected = await PopContract.attach("0xC14724Ed33fD1f77D76dc0Ac1b7772C3F0C75d91");
   //const status = await connected.pausePublic(false);
   //console.log("Mint status: ", status);
   //for(let i = 1; i < 375; i++) {
-    try {
+  /*  try {
       //console.log("Minting " + i + " now");
       await connected.mintFTM(1, {gasLimit: 400000});
     } catch(error) {
       console.log(error);
     }
-  //}
+  //}*/
   //await connected.setBaseURI("https://gateway.pinata.cloud/ipfs/QmVquDcwREjYePxeE3E5qM8xG2Jxw84pvjM3p7q5rtGnv5/");
   //console.log("Base URI: ", await connected.baseURI);
   //await connected.pausePublic(false);
