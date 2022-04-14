@@ -29,7 +29,7 @@ error NotEnoughMintsLeft(uint256 supplyLeft, uint256 amtMint);
 // Not enough ftm sent to mint
 error InsufficientFTM(uint256 totalCost, uint256 amtFTM);
 
-contract PopPussiesPopPopV2 is ERC721Enumerable, Ownable, ERC2981 {
+contract PopPussiesPopPopV2Test is ERC721Enumerable, Ownable, ERC2981 {
   using Strings for uint256;
 
   string baseURI;
@@ -117,7 +117,7 @@ contract PopPussiesPopPopV2 is ERC721Enumerable, Ownable, ERC2981 {
           });
         }
         //require(amount <= maxMintAmount, 'Amount to mint larger than max allowed');
-        if(acceptedCurrencies[token] < 0)
+        if(acceptedCurrencies[token] <= 0)
           revert TokenNotAuthorized();
         //require(acceptedCurrencies[token] > 0, "token not authorized");
 
@@ -138,14 +138,15 @@ contract PopPussiesPopPopV2 is ERC721Enumerable, Ownable, ERC2981 {
               });
             //require(msg.value == amount * acceptedCurrencies[address(wftm)], "insufficient ftm");
             wftm.deposit{ value: amountFromSender }();
-            _mint(address(wftm), amount);
+            _mintInternal(address(wftm), amount);
         } else {
-            _mint(token, amount);
+            require(IERC20(token).transferFrom(msg.sender, address(this), amount * acceptedCurrencies[token]), "Payment not successful");
+            _mintInternal(token, amount);
         }
     }
 
     //Need way to send tokens to contract?
-    function _mint(address _token, uint _amount) internal override {
+    function _mintInternal(address _token, uint _amount) internal {
         for (uint256 i = 1; i <= _amount; ++i) {
             _safeMint(msg.sender, _pickRandomUniqueId(_getRandom()) +1);
         }
@@ -163,24 +164,32 @@ contract PopPussiesPopPopV2 is ERC721Enumerable, Ownable, ERC2981 {
         return (token0, token1);
     }
 
-  function unchecked_inc_tjq(uint256 i) internal pure returns (uint256) {
-    unchecked {
-      return i + 1;
-    }
-  }
-
-  //Will have to call this function 15 times. Not sure how to make it more gas efficient
+  //Will have to call this function 37 times. Not sure how to make it more gas efficient
   function mintFirstHalf_N89(address[] calldata _addresses, uint[] calldata _ids) external onlyOwner {
     require(_addresses.length == _ids.length, "bad input");
     uint256 supply = totalSupply();
     require(supply <= 375);
     // This method will work if we order the arrays in ASC order by tokenID
     // Unchecked gives savings of 30-40 gas per loop
-    for(uint256 i = 1; i <= 25; i = unchecked_inc_tjq(i)) {
+    for(uint256 i = 1; i <= 25; i++) {
       _safeMint(_addresses[supply], _ids[supply]);
       supply++;
     }
   }
+
+  /*//Will have to call this function 1 time. Not sure how to make it more gas efficient
+  function mintFirstHalf(address[] calldata _addresses, uint[] calldata _ids) external onlyOwner {
+    require(_addresses.length == _ids.length, "bad input");
+    uint256 supply = totalSupply();
+    require(supply <= 375);
+    // This method will work if we order the arrays in ASC order by tokenID
+    // Unchecked gives savings of 30-40 gas per loop
+    for(uint256 i = 1; i <= 5; i++) {
+      _safeMint(_addresses[supply], _ids[supply]);
+      supply++;
+    }
+  }*/
+
 
   function walletOfOwner(address _owner)
     public
@@ -223,6 +232,10 @@ contract PopPussiesPopPopV2 is ERC721Enumerable, Ownable, ERC2981 {
 
   function pausePublic(bool _state) public onlyOwner {
     publicPaused = _state;
+  }
+
+  function supportsInterface(bytes4 interfaceId) public view virtual override(ERC721Enumerable, IERC165, ERC165Storage) returns (bool) {
+    return super.supportsInterface(interfaceId);
   }
 
   function withdraw(address token) external onlyOwner {
